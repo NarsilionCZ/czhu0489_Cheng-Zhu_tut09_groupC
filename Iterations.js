@@ -2,13 +2,6 @@ let stripes = [];           // Array to store all line stripe objects
 let currentStripe = 0;      // Index of the current stripe being animated
 
 let mode = 0;               // Drawing mode: 0 = cross pattern, 1 = parallel lines
-let disturbed = false;
-
-let disturbTimer = 0;
-let disturbInterval = 100;
-let disturbDuration = 20; 
-let disturbedImg = null;
-let originalImg = null; 
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -19,6 +12,7 @@ function setup() {
   let rangeX = windowWidth * 0.5;
   let rangeY = windowHeight * 0.5;
   let rangeLength = windowWidth * 0.5;
+
   // Define angle options based on drawing mode
   let baseAngles;
   if (mode == 0) {
@@ -28,13 +22,13 @@ function setup() {
   }
 
   // Generate 100 line stripe objects
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 80; i++) {
     stripes.push(new LineStripe(
       random(-rangeX, rangeX),          // x position
       random(-rangeY, rangeY),          // y position
-      random(20, rangeLength),          // length of each line
-      random(0.1, 6),                   // spacing between lines
-      floor(random(6, 20)),             // number of lines in each stripe
+      random(100, rangeLength),          // length of each line
+      random(0.1, 2),                   // spacing between lines
+      floor(random(6, 30)),             // number of lines in each stripe
       random(baseAngles),               // angle of rotation
       random(0.1, 1)                    // base stroke weight
     ));
@@ -42,6 +36,7 @@ function setup() {
 }
 
 function draw() {
+  background(240, 240, 225); // Clear background each frame
   translate(width / 2, height / 2);  
 
   // Animate stripes one at a time
@@ -50,14 +45,11 @@ function draw() {
     if (stripes[currentStripe].done) {
       currentStripe++;
     }
-    if (currentStripe === stripes.length && !originalImg) {
-      resetMatrix();
-      originalImg = get(0, 0, width, height);
-    }
-  } else {
-    disturbAnimnation();
+  } 
+  for (let i = 0; i < currentStripe; i++){
+    stripes[i].update();
+    stripes[i].displayStep();
   }
-
   drawModeButton(); // Draw UI button
 }
 
@@ -106,9 +98,8 @@ function mousePressed() {
     // Reset everything and rerun setup
     stripes = [];
     currentStripe = 0;
-    disturbed = false;
-    setup();
     loop();
+    setup();
   }
 }
 
@@ -118,9 +109,7 @@ function windowResized() {
   background(240, 240, 225); 
   stripes = [];
   currentStripe = 0;
-  disturbed = false;
   setup(); // regenerate stripes on resize
-  loop();
 }
 
 // LineStripe class for generating and animating a set of lines
@@ -130,7 +119,7 @@ class LineStripe {
     this.y = y;                        //Position of line
     this.len = len;                    //Length of line
     this.spacing = spacing;            //Spacing of line
-    this.count = count;                // Number of lines in the stripe
+    this.count = count;                //Number of lines in the stripe
     this.angle = angle;                //Angle of line
     this.baseWeight = baseWeight;      //Width of line stroke
     this.lines = [];                   //Array to store the lines
@@ -141,10 +130,19 @@ class LineStripe {
     // Initialize each line’s parameters
     for (let i = 0; i < this.count; i++) {
       let offsetY = i * this.spacing;                     // avoid overlapping lines
-      let opacity = random(2, 100);                       // random opacity
+      let opacity = random(1,255);                       // random opacity
       let weight = this.baseWeight + random(-0.1, 0.5);   // random weight variation
       let m = round(random(3));                           // direction modifier (0 or 1)
       this.lines.push({ offsetY, opacity, weight, m });   
+    }
+      this.t = random(1000);
+  }
+
+  update(){
+    this.t += 0.01;
+    for (let i = 0; i < this.lines.length; i++){
+      let n = noise(this.x * 0.01, this.y * 0.01, this.t);
+      this.lines[i].opacity = map(n, 0, 1, 20, 255);
     }
   }
 
@@ -170,68 +168,10 @@ class LineStripe {
 
     // Animate growth of lines
     if (this.currentLen < this.len) {
-      this.currentLen += 100;
+      this.currentLen += 20;
     } else {
       this.done = true; //Mark done and continue to draw the next lines
     }
     pop();
-  }
-}
-
-function disturbPixels() {
-  resetMatrix();
-  let step = 2;
-  let disturbRateRow = random(0.01, 0.1); 
-  let disturbRateCol = random(0.01, 0.1); 
-  let snap = get(0, 0, width, height);
-  background(240, 240, 225);
-
-  let tempGfx = createGraphics(width, height);
-  tempGfx.background(240, 240, 225);
-  for (let y = 0; y < height; y += step) {
-    if (random() < disturbRateRow) {
-      let nx = noise(y * 0.02, frameCount * 0.01);
-      let dx = int(map(nx, 0, 1, -step * 10, step * 10));
-      let tx = constrain(dx, -width + 1, width - 1);
-      let rowImg = snap.get(0, y, width, step);
-      tempGfx.image(rowImg, tx, y);
-    } else {
-      let rowImg = snap.get(0, y, width, step);
-      tempGfx.image(rowImg, 0, y);
-    }
-  }
-
-  let tempSnap = tempGfx.get(0, 0, width, height);
-  for (let x = 0; x < width; x += step) {
-    if (random() < disturbRateCol) {
-      let nx = noise(x * 0.02, frameCount * 0.01 + 1000);
-      let dy = int(map(nx, 0, 1, -step * 10, step * 10));
-      let ty = constrain(dy, -height + 1, height - 1);
-      let colImg = tempSnap.get(x, 0, step, height);
-      image(colImg, x, ty);
-    } else {
-      let colImg = tempSnap.get(x, 0, step, height);
-      image(colImg, x, 0);
-    }
-  }
-}
-
-function disturbAnimnation(){
-  disturbTimer++;
-  if (disturbTimer === 1) {
-      disturbPixels(); 
-      disturbedImg = get(0,0, width, height); 
-  } else if (disturbTimer > 1 && disturbTimer <= disturbDuration) {
-      resetMatrix();
-      image(disturbedImg, 0,0);
-  } else {
-    resetMatrix();
-    
-    if (originalImg) {
-      image(originalImg, 0, 0);
-    } 
-    if (disturbTimer > disturbInterval) {
-      disturbTimer = 0;
-    }
   }
 }
