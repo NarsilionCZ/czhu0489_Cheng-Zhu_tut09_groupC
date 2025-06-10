@@ -9,9 +9,9 @@ function setup() {
   background(240, 240, 225);
 
   // Define ranges for stripe placement
-  let rangeX = windowWidth * 0.3;
-  let rangeY = windowHeight * 0.3;
-  let rangeLength = windowWidth * 0.5;
+  let rangeX = windowWidth * 0.5;
+  let rangeY = windowHeight * 0.5;
+  let rangeLength = windowWidth * 0.3;
 
   // Define angle options based on drawing mode
   let baseAngles;
@@ -22,7 +22,7 @@ function setup() {
   }
 
   // Generate 100 line stripe objects
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 50; i++) {
     stripes.push(new LineStripe(
       random(-rangeX, rangeX),          // x position
       random(-rangeY, rangeY),          // y position
@@ -36,6 +36,7 @@ function setup() {
 }
 
 function draw() {
+  background(240, 240, 225); // Clear background each frame
   translate(width / 2, height / 2);  
 
   // Animate stripes one at a time
@@ -44,10 +45,11 @@ function draw() {
     if (stripes[currentStripe].done) {
       currentStripe++;
     }
-  } else {
-    noLoop(); // Stop drawing once all stripes are done
+  } 
+  for (let i = 0; i < currentStripe; i++){
+    stripes[i].update();
+    stripes[i].displayStep();
   }
-
   drawModeButton(); // Draw UI button
 }
 
@@ -128,10 +130,19 @@ class LineStripe {
     // Initialize each line’s parameters
     for (let i = 0; i < this.count; i++) {
       let offsetY = i * this.spacing;                     // avoid overlapping lines
-      let opacity = random(2, 100);                       // random opacity
+      let opacity = 100;                       // random opacity
       let weight = this.baseWeight + random(-0.1, 0.5);   // random weight variation
       let m = round(random(3));                           // direction modifier (0 or 1)
       this.lines.push({ offsetY, opacity, weight, m });   
+    }
+      this.t = random(1000);
+  }
+
+  update(){
+    this.t += 0.01;
+    for (let i = 0; i < this.lines.length; i++){
+      let n = noise(this.x * 0.01, this.y * 0.01, this.t);
+      this.lines[i].opacity = map(n, 0, 1, 20, 255);
     }
   }
 
@@ -157,10 +168,12 @@ class LineStripe {
 
     // Animate growth of lines
     if (this.currentLen < this.len) {
-      this.currentLen += 10;
+      this.currentLen += 100;
     } else {
       this.done = true; //Mark done and continue to draw the next lines
     }
     pop();
   }
+
+
 }
