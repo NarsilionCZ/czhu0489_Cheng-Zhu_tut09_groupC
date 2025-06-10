@@ -11,7 +11,7 @@ function setup() {
   // Define ranges for stripe placement
   let rangeX = windowWidth * 0.5;
   let rangeY = windowHeight * 0.5;
-  let rangeLength = windowWidth * 0.3;
+  let rangeLength = windowWidth * 0.5;
 
   // Define angle options based on drawing mode
   let baseAngles;
@@ -27,8 +27,8 @@ function setup() {
       random(-rangeX, rangeX),          // x position
       random(-rangeY, rangeY),          // y position
       random(20, rangeLength),          // length of each line
-      random(0.1, 8),                   // spacing between lines
-      floor(random(6, 50)),             // number of lines in each stripe
+      random(0.1, 2),                   // spacing between lines
+      floor(random(6, 30)),             // number of lines in each stripe
       random(baseAngles),               // angle of rotation
       random(0.1, 1)                    // base stroke weight
     ));
@@ -130,7 +130,7 @@ class LineStripe {
     // Initialize each line’s parameters
     for (let i = 0; i < this.count; i++) {
       let offsetY = i * this.spacing;                     // avoid overlapping lines
-      let opacity = 100;                       // random opacity
+      let opacity = random(1,255);                       // random opacity
       let weight = this.baseWeight + random(-0.1, 0.5);   // random weight variation
       let m = round(random(3));                           // direction modifier (0 or 1)
       this.lines.push({ offsetY, opacity, weight, m });   
@@ -174,6 +174,4 @@ class LineStripe {
     }
     pop();
   }
-
-
 }
