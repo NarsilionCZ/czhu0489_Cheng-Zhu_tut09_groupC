@@ -97,7 +97,7 @@ function mousePressed() {
   let x = margin;
   let y = height - btnH - margin;
 
-  if (
+  if (                                         // Judgement for whether the mouse is within the button area
     mouseX >= x && mouseX <= x + btnW &&
     mouseY >= y && mouseY <= y + btnH
   ) {
@@ -187,22 +187,23 @@ function disturbPixels() {
   let snap = get(0, 0, width, height);       // Take a snapshot of the current canvas
   let maxOffset = random(20);                // Maximum offset for disturbance
   
-
-  let tempGfx = createGraphics(width, height); // Create a temporary graphics buffer
-  tempGfx.background(240, 240, 225);
+  // Create a temporary graphics buffer to draw disturbed image
+  // createGraphics() is not covered in the course, see explanation in README
+  let tempImg = createGraphics(width, height); 
+  tempImg.background(240, 240, 225);
   for (let y = 0; y < height; y += step) {
     if (random() < disturbRateRow) {           
       let noiseX = noise(y * 0.02, frameCount * 0.01);
       let disturbX = int(map(noiseX, 0, 1, -maxOffset, maxOffset)); // Calculate disturbance offset for the row
       let rowImg = snap.get(0, y, width, step);                     // Get the row image from the snapshot
-      tempGfx.image(rowImg, disturbX, y);                           // Draw the row image with disturbance offset
+      tempImg.image(rowImg, disturbX, y);                           // Draw the row image with disturbance offset
     } else {
       let rowImg = snap.get(0, y, width, step);                     // Get the row image from the snapshot without disturbance
-      tempGfx.image(rowImg, 0, y);
+      tempImg.image(rowImg, 0, y);
     }
   }
 
-  let tempSnap = tempGfx.get(0, 0, width, height);                  // Get the row-modified graphics buffer
+  let tempSnap = tempImg.get(0, 0, width, height);                  // Get the row-modified graphics buffer
   for (let x = 0; x < width; x += step) {                           // Same process for columns
     if (random() < disturbRateCol) {
       let noiseY = noise(x * 0.02, frameCount * 0.01 + 1000);
