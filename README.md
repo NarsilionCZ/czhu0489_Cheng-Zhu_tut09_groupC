@@ -59,7 +59,7 @@ The global variables includes disturbed state, animation timer, animation interv
 The running logic of the code is to call the function `disturbAnimation()` within the `draw()` function, and then within `disturbAnimation()`, it calls the function `disturbPixels()` in a timer loop to achieve the effect of a timed cyclic animation.
 
 3. Key functions:  
-I used `createGraphic()` in the code, which was not covered in the course. It can create a temporary graphics buffer not shown on the canvas to handle disturbing process and cover the final image to the canvas. By combining this function with `get()` and `image()`, one can achieve the effect of local disturbance on the image.  
+I used `createGraphics()` (https://p5js.org/reference/p5/createGraphics/) in the code, which was not covered in the course. It can create a temporary graphics buffer not shown on the canvas to handle disturbing process and cover the final image to the canvas. By combining this function with `get()` and `image()`, one can achieve the effect of local disturbance on the image.  
 In addition, `noise()` is used to generate disturbance.
 
 4. Workflow:  
@@ -78,7 +78,7 @@ Here is also a handsketch for explaning the process.
 
 ---
 
-## Reference
+## References
 The Coding Train. (2017). Perlin Noise in Two Dimensions (p5.js) [video]. https://www.youtube.com/watch?v=ikwNrFvnL3g
 
 QianMo. (2020). GlitchRGBSplit. https://github.com/QianMo/X-PostProcessing-Library/tree/534a22613af8a29ab5719e9e529ccd4ef214da3a/Assets/X-PostProcessing/Effects/GlitchRGBSplit
