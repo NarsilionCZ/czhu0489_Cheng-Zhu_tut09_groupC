@@ -1,12 +1,12 @@
 let stripes = [];           // Array to store all line stripe objects
 let currentStripe = 0;      // Index of the current stripe being animated
-
 let mode = 0;               // Drawing mode: 0 = cross pattern, 1 = parallel lines
-let disturbed = false;
 
+//global variables for disturbance animation
+let disturbed = false;
 let disturbTimer = 0;
 let disturbInterval = 100;
-let disturbDuration = 20; 
+let disturbDuration = 15; 
 let disturbedImg = null;
 let originalImg = null; 
 
@@ -178,37 +178,37 @@ class LineStripe {
   }
 }
 
+// Add disturbPixels function to create a pixel disturbance effect
 function disturbPixels() {
   resetMatrix();
-  let step = 2;
-  let disturbRateRow = random(0.01, 0.1); 
-  let disturbRateCol = random(0.01, 0.1); 
-  let snap = get(0, 0, width, height);
-  background(240, 240, 225);
+  let step = 5;                              // Step size for pixel disturbance
+  let disturbRateRow = random(0.05, 0.3);    // Disturbance rate for rows
+  let disturbRateCol = random(0.05, 0.3);    // Disturbance rate for columns
+  let snap = get(0, 0, width, height);       // Take a snapshot of the current canvas
+  let maxOffset = random(20);                // Maximum offset for disturbance
+  
 
-  let tempGfx = createGraphics(width, height);
+  let tempGfx = createGraphics(width, height); // Create a temporary graphics buffer
   tempGfx.background(240, 240, 225);
   for (let y = 0; y < height; y += step) {
-    if (random() < disturbRateRow) {
-      let nx = noise(y * 0.02, frameCount * 0.01);
-      let dx = int(map(nx, 0, 1, -step * 10, step * 10));
-      let tx = constrain(dx, -width + 1, width - 1);
-      let rowImg = snap.get(0, y, width, step);
-      tempGfx.image(rowImg, tx, y);
+    if (random() < disturbRateRow) {           
+      let noiseX = noise(y * 0.02, frameCount * 0.01);
+      let disturbX = int(map(noiseX, 0, 1, -maxOffset, maxOffset)); // Calculate disturbance offset for the row
+      let rowImg = snap.get(0, y, width, step);                     // Get the row image from the snapshot
+      tempGfx.image(rowImg, disturbX, y);                           // Draw the row image with disturbance offset
     } else {
-      let rowImg = snap.get(0, y, width, step);
+      let rowImg = snap.get(0, y, width, step);                     // Get the row image from the snapshot without disturbance
       tempGfx.image(rowImg, 0, y);
     }
   }
 
-  let tempSnap = tempGfx.get(0, 0, width, height);
-  for (let x = 0; x < width; x += step) {
+  let tempSnap = tempGfx.get(0, 0, width, height);                  // Get the row-modified graphics buffer
+  for (let x = 0; x < width; x += step) {                           // Same process for columns
     if (random() < disturbRateCol) {
-      let nx = noise(x * 0.02, frameCount * 0.01 + 1000);
-      let dy = int(map(nx, 0, 1, -step * 10, step * 10));
-      let ty = constrain(dy, -height + 1, height - 1);
+      let noiseY = noise(x * 0.02, frameCount * 0.01 + 1000);
+      let disturbY = int(map(noiseY, 0, 1, -maxOffset, maxOffset));
       let colImg = tempSnap.get(x, 0, step, height);
-      image(colImg, x, ty);
+      image(colImg, x, disturbY);
     } else {
       let colImg = tempSnap.get(x, 0, step, height);
       image(colImg, x, 0);
@@ -216,21 +216,21 @@ function disturbPixels() {
   }
 }
 
+// Function to handle the disturbance animation
 function disturbAnimnation(){
   disturbTimer++;
-  if (disturbTimer === 1) {
+  if (disturbTimer === 1) {                                            // When the disturbance starts
       disturbPixels(); 
       disturbedImg = get(0,0, width, height); 
-  } else if (disturbTimer > 1 && disturbTimer <= disturbDuration) {
+  } else if (disturbTimer > 1 && disturbTimer <= disturbDuration) {    // disturbDuration decides the duration of disturbance
       resetMatrix();
       image(disturbedImg, 0,0);
-  } else {
+  } else {                                                             // After disturbance back to original image
     resetMatrix();
-    
     if (originalImg) {
       image(originalImg, 0, 0);
     } 
-    if (disturbTimer > disturbInterval) {
+    if (disturbTimer > disturbInterval) {                               // Reset timer for next disturbance
       disturbTimer = 0;
     }
   }
