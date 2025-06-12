@@ -110,6 +110,8 @@ function windowResized() {
   stripes = [];
   currentStripe = 0;
   disturbed = false;
+  originalImg = null;
+  disturbedImg = null;
   setup(); // regenerate stripes on resize
   loop();
 }
