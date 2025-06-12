@@ -3,8 +3,8 @@
 **Creative Coding Major Project**
 
 ## <span style="color: green;">1. Instructions</span>:
-1. Load `index.html`, click the button or change the page size
-2. Wait for the image to be generated. (about 5 seconds)
+1. Load `index.html`, click the button or change the page size for initializing.
+2. Wait for the image to be generated (about 5 seconds).
 3. The `index.html` runs the code in `sketch.js`, which is the final result of my task. `Iterations.js` is only a recording for ideas and iterations.
 
 ## <span style="color: green;">2. Key features</span>:

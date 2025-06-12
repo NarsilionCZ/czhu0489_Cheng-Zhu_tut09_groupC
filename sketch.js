@@ -1,6 +1,5 @@
 let stripes = [];           // Array to store all line stripe objects
 let currentStripe = 0;      // Index of the current stripe being animated
-let mode = 0;               // Drawing mode: 0 = cross pattern, 1 = parallel lines
 
 //global variables for disturbance animation
 let disturbed = false;
@@ -19,13 +18,7 @@ function setup() {
   let rangeX = windowWidth * 0.5;
   let rangeY = windowHeight * 0.5;
   let rangeLength = windowWidth * 0.5;
-  // Define angle options based on drawing mode
-  let baseAngles;
-  if (mode == 0) {
-    baseAngles = [0, 90, -90]; // cross pattern
-  } else if (mode == 1) {
-    baseAngles = [0];          // parallel horizontal lines
-  }
+  let baseAngles = [0, 90, -90];
 
   // Generate 100 line stripe objects
   for (let i = 0; i < 100; i++) {
@@ -42,27 +35,26 @@ function setup() {
 }
 
 function draw() {
-  translate(width / 2, height / 2);  
-
+  translate(width / 2, height / 2);     // Center the drawing context
   // Animate stripes one at a time
   if (currentStripe < stripes.length) {
     stripes[currentStripe].displayStep();
     if (stripes[currentStripe].done) {
       currentStripe++;
     }
-    if (currentStripe === stripes.length && !originalImg) {
+    if (currentStripe === stripes.length && !originalImg) { // When all stripes are drawn, save the original image
       resetMatrix();
       originalImg = get(0, 0, width, height);
     }
   } else {
-    disturbAnimnation();
+    disturbAnimnation();                                    // and start disturbance animation
   }
 
-  drawModeButton(); // Draw UI button
+  drawButton(); // Draw UI button
 }
 
-// Draws a button at the bottom left corner to toggle drawing mode
-function drawModeButton() {
+// Draws a button at the bottom left corner to regenerate stripes
+function drawButton() {
   push();
   resetMatrix();//
   // Button position and size adapt to the canvas
@@ -82,14 +74,14 @@ function drawModeButton() {
   textSize(btnH * 0.45); // The font size changes according to the height of the button
   textAlign(CENTER, CENTER);
   text(
-    mode === 1 ? "Switch to cross" : "Switch to parallel",
+    "Regenerate",
     x + btnW / 2,
     y + btnH / 2
   );
   pop();
 }
 
-// Handle mouse click for toggling modes
+// Handle mouse click for regenerating stripes
 function mousePressed() {
   let margin = 0.025 * min(width, height);
   let btnW = 0.25 * width;
@@ -101,12 +93,11 @@ function mousePressed() {
     mouseX >= x && mouseX <= x + btnW &&
     mouseY >= y && mouseY <= y + btnH
   ) {
-    mode = mode === 1 ? 0 : 1;
-
-    // Reset everything and rerun setup
-    stripes = [];
+    stripes = [];                              // Reset setup
     currentStripe = 0;
     disturbed = false;
+    originalImg = null;
+    disturbedImg = null;
     setup();
     loop();
   }
@@ -143,8 +134,8 @@ class LineStripe {
       let offsetY = i * this.spacing;                     // avoid overlapping lines
       let opacity = random(2, 100);                       // random opacity
       let weight = this.baseWeight + random(-0.1, 0.5);   // random weight variation
-      let m = round(random(3));                           // direction modifier (0 or 1)
-      this.lines.push({ offsetY, opacity, weight, m });   
+      let direction = round(random(3));                           // direction modifier (0 or 1)
+      this.lines.push({ offsetY, opacity, weight, direction });   
     }
   }
 
@@ -160,8 +151,8 @@ class LineStripe {
       stroke(this.gray, l.opacity);
       strokeWeight(l.weight);
       
-      //Decide the growing direction of line based on mode
-      if (l.m == 0) {
+      //Decide the growing direction of line 
+      if (l.direction == 0) {
         line(0 + l.offsetY, l.offsetY, this.currentLen + l.offsetY, l.offsetY);
       } else {
         line(this.len + l.offsetY, l.offsetY, this.len - this.currentLen + l.offsetY, l.offsetY);
@@ -231,7 +222,7 @@ function disturbAnimnation(){
     if (originalImg) {
       image(originalImg, 0, 0);
     } 
-    if (disturbTimer > disturbInterval) {                               // Reset timer for next disturbance
+    if (disturbTimer > disturbInterval) {                              // Reset timer for next disturbance
       disturbTimer = 0;
     }
   }
