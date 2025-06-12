@@ -8,7 +8,7 @@
 3. The `index.html` runs the code in `sketch.js`, which is the final result of my task. `Iterations.js` is only a recording for ideas and iterations.
 
 ## <span style="color: green;">2. Key features</span>:
-Adapted from group task (https://github.com/TTTED123/MajorProduct_9103_Group_-Somwrita-C) using **Perlin noise** to add <span style="color: cyan;">dynamic disturbance effects</span>.
+Adapted from group task (https://github.com/TTTED123/MajorProduct_9103_Group_-Somwrita-C.git) using **Perlin noise** to add <span style="color: cyan;">dynamic disturbance effects</span>.
 
 ## <span style="color: green;">3. Inspiration (iterations)</span>:
 At first, I tried to retain Mohamedi's artistic style, which is composed of **black and white straight lines**. However, since the code of our group itself is already a style for generative art, with various parameters being relatively random, any processing of parameters such as the generation position, spacing, length, etc. of the lines by applying perlin noise would not lead to significant changes in the visual effect. 
